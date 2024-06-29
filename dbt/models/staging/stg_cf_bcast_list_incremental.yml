@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: stg_cf_bcast_list_incremental
+    description: "This model tracks broadcast messages, their delivery status, and user interactions."
+    columns:
+
+      - name: broadcast_timestamp
+        description: "The timestamp of when the broadcast was made, parsed to a datetime object"
+        data_tests:
+          - not_null
+          - unique
+
+      - name: broadcast_message
+        description: "The content of the broadcast message."
+        data_tests:
+          - not_null
+
+      - name: broadcast_progress
+        description: "The progress status of the broadcast."
+        data_tests:
+          - accepted_values:
+              values: ['delivered', 'in progress']
+          - not_null
+
+      - name: total_recipients
+        description: "The total number of users the broadcast was sent to."
+        data_tests:
+          - not_null
+
+      - name: total_opened
+        description: "The number of users who opened the broadcast."
+        data_tests:
+          - not_null
+
+      - name: total_clicked
+        description: "The number of users who clicked on something within the broadcast."
+        data_tests:
+          - not_null
+
+      - name: failed_to_deliver
+        description: "The number of broadcasts that failed to deliver."
+        data_tests:
+          - not_null
+
+      - name: last_updated_dt
+        description: "The timestamp of the last update to the record."
+        data_tests:
+          - not_null

@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: int_cf_broadcast_audience 
+    description: "This model matches broadcast filters with their names, 
+    so we can add it into the broadcast table later and 
+    know the segments of the users who received it."
+    columns:
+      - name: broadcast_id
+        description: "The id of the broadcast."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: broadcast_timestamp
+        description: "The date and time when the broadcast was sent."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: broadcast_audience
+        description: "The names of users segments."
+        data_tests:
+          - not_null

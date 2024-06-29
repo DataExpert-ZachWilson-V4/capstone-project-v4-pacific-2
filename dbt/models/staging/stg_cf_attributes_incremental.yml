@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: stg_cf_attributes_incremental 
+    description: "This model manages user attributes, ensuring only the latest attributes are stored incrementally."
+    columns:
+      - name: chatfuel_user_id
+        description: "The unique identifier for a Chatfuel user."
+        data_tests:
+          - not_null
+
+      - name: attribute_name
+        description: "The name of the attribute stored for the user."
+        data_tests:
+          - not_null
+
+      - name: attribute_value
+        description: "The value associated with the user's attribute."
+        data_tests:
+          - not_null
+          
+      - name: last_updated_date
+        description: "The most recent date when the attribute was updated."
+        data_tests:
+          - not_null

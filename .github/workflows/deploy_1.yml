@@ -1,0 +1,47 @@
+name: Deploy | Production
+
+on:
+  push:
+    branches:
+      - prod
+  workflow_dispatch:
+
+env:
+  USER: root
+  SERVER: 140.82.50.104
+  BASE_DIR: /root/aaa
+  SERVICE_ACCOUNT_KEY_JSON: ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Write secrets to a file
+      run: |
+        mkdir -p secrets
+        echo $SERVICE_ACCOUNT_KEY_JSON | base64 -di > ./secrets/blended-setup.json
+
+    - name: Write secrets to .env
+      run: |
+        echo -e "AIRFLOW_UID=0\n" > .env
+        echo -e "CHATFUEL_TOKEN='${{ secrets.CHATFUEL_TOKEN }}'\n" >> .env
+        echo -e "CHATFUEL_BOT_ID='${{ secrets.CHATFUEL_BOT_ID }}'\n" >> .env
+
+    - name: Deploy
+      run: |
+        eval `ssh-agent -s`
+        ssh-add - <<< "${{ secrets.COMPUTER_KEY }}"
+        echo "rsync..."
+        rsync -e "ssh -o StrictHostKeyChecking=no" -rtvu . $USER@$SERVER:$BASE_DIR/
+        ssh $USER@$SERVER << EOF
+          echo -e "Deploying...\n"
+          cd $BASE_DIR
+
+          git ls-files . --exclude-standard --others | xargs --no-run-if-empty rm
+          echo -e "\nDONE"
+        EOF
+

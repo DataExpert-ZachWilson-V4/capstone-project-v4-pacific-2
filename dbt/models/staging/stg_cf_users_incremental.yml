@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: stg_cf_users_incremental 
+    description: "This model processes users data and ensures incremental updates based on changes."
+    columns:
+      - name: chatfuel_user_id
+        description: "User id"
+        data_tests:
+          - not_null
+      - name: signed_up
+        description: "Date when the user signed up"
+        data_tests:
+          - not_null
+      - name: status
+        description: "Status of the user"
+        data_tests:
+          - accepted_values:
+              values: ['reachable', 'blocked']

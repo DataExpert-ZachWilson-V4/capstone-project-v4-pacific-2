@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: userbase_staging
+    tables:
+      - name: cf_users
+      - name: cf_attributes
+      - name: cf_broadcast_recipients
+      - name: cf_broadcasts_list
+      - name: cf_user_filters
+      - name: cf_segment_list
+      - name: stg_cf_users_incremental
+      - name: stg_cf_bcast_list_incremental
+      - name: stg_cf_attributes_incremental
+      - name: stg_cf_user_filters_incremental
+      - name: stg_cf_segment_list_incremental
+      - name: int_cf_broadcast_audience
+      - name: int_cf_attributes
+      - name: int_cf_users_combined
+      - name: int_cf_broadcast_list

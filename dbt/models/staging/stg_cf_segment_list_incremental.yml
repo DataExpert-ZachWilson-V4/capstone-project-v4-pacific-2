@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: stg_cf_segment_list_incremental 
+    description: "This model manages users segments that were build in CF, ensuring only the segments that changed or new ones are stored incrementally."
+    columns:
+      - name: segment_id
+        description: "The id of the segment."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: segment_name
+        description: "The name of the segment."
+        data_tests:
+          - not_null
+
+      - name: last_updated_date
+        description: "The most recent date when the attribute was updated."
+        data_tests:
+          - not_null

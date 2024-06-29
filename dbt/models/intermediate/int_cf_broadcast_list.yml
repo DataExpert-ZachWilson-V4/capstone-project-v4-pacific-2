@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: int_cf_broadcast_list 
+    description: "This model add broadcast audience to the broadcast list."
+    columns:
+      - name: broadcast_timestamp
+        description: "The date and time when the broadcast was sent."
+        data_tests:
+          - not_null
+      
+      # - name: broadcast_audience
+      #   tests:
+      #     - not_null

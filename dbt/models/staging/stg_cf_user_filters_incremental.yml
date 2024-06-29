@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: stg_cf_user_filters_incremental 
+    description: "This model stores all user filters that were used per broadcast and updating only for the new broadcasts."
+    columns:
+      - name: broadcast_id
+        description: "The id of the broadcast."
+        data_tests:
+          - not_null
+
+      - name: broadcast_timestamp
+        description: "Date and time when the broadcast was sent."
+        data_tests:
+          - not_null
+
+      - name: operation
+        description: "How the filters connected to each other per broadcast (could be OR or AND)."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['or', 'and']
+
+      - name: valid
+        description: "Whether filter is valid."
+        data_tests:
+          - not_null  
+
+      - name: parameters_operation
+        description: "Relationship between the value of the filter and the filter (could be = / != / etc)."
+        data_tests:
+          - not_null
+
+      - name: parameters_type
+        description: "The type of parameter (could be custom / sequence / segment / etc)."
+        data_tests:
+          - not_null
+
+      - name: element
+        description: "The value of the filter."
+        data_tests:
+          - not_null

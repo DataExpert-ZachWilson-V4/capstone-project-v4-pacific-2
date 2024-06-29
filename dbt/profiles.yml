@@ -1,0 +1,11 @@
+my-bigquery-db:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: blended-setup
+      dataset: userbase_staging
+      threads: 5 
+      keyfile: ../secrets/blended-setup.json
+      location: us-west1

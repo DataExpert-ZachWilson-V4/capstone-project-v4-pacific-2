@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: int_cf_users_combined 
+    description: "This model processes users data does KPI analysis per day."
+    columns:
+      - name: date
+        description: "Date of the  analysis"
+        data_tests:
+          - not_null
+          - unique

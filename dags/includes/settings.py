@@ -1,0 +1,7 @@
+DATASET_ID = "userbase_staging"
+RECIPIENTS_T_ID = "cf_broadcast_recipients"
+USER_FILTERS_T_ID = "cf_user_filters"
+SEGMENT_TABLE_ID = "cf_segment_list"
+BROADCASTS_LIST_T_ID = "cf_broadcasts_list"
+CF_ATTRIBUTES_T_ID = "cf_attributes"
+CF_USERS_T_ID = "cf_users"

@@ -1,0 +1,5 @@
+apache-airflow
+dbt-core
+dbt-bigquery
+Jinja2
+pandas
