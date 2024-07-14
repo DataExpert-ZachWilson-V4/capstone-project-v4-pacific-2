@@ -36,7 +36,7 @@ Chatfuel provides a visual interface for filtering user base attributes, but it 
 
 An example of this visual interface.    
 
-![chatfuel people tab](https://github.com/mariavyso/proto_pipeline/assets/77248576/9843cd57-ac60-4724-94aa-522f7f75fea4)
+![chatfuel people tab](./readme_img/people_tab_cf.png)
 [source of the image](https://docs.chatfuel.com/en/articles/1575151-people-tab)
 ##
 
@@ -54,7 +54,7 @@ Therefore, my only path was to reverse-engineer requests to their GraphQL databa
 Here is the screenshot of the part of the CSV file with the user data (the user is me), that you will receive after the request to the Chatfuel user db. You may see that the name of the attribute is the column here and if the users doesn’t have this attribute, the value would be empty. Besides, because there is no way to track events, the bot builders need to write new attribute names every time, to be able to track the user behavior. Thus, the list of attributes grows to more than 1700, and the final table that you are going to receive would have more than 1700 columns times the number of users that you have.
 
 
-![example of the raw data from cf](https://github.com/mariavyso/proto_pipeline/assets/77248576/37611e0e-fc2d-46d4-abc1-4563d3732ef5)
+![example of the raw data from cf](./readme_img/csv_cf_example.png)
 
 
 ## 
@@ -63,7 +63,7 @@ This made me think about simulating event-based data myself. Because users inter
 The table I’ll have at the end of the data transformation in the pipeline (made from the screenshot of the CSV file you saw earlier):
 
 
-![example of the transformed data](https://github.com/mariavyso/proto_pipeline/assets/77248576/e84bc26d-7eb5-4b71-90ff-4c05a17c265a)  
+![example of the transformed data](./readme_img/final_table_example.png)  
 
 
       
@@ -90,7 +90,7 @@ Given the company's active use of GCP, the final dashboard is in Looker, using B
 
 Tl;dr - At some point while working on this pipeline, I realized that I have so many Python scripts and models, that I can’t remember what script does what, so I made this schema for myself, hopefully, it will help you to gain this understanding too.
 
-![schema of tables](https://github.com/mariavyso/proto_pipeline/assets/77248576/8121f19a-85af-46a7-85ec-3013fd83b6c0)
+![schema of tables](./readme_img/schema_whole_airflow.png)
 
 ***All the BigQuery screenshots, that you will see later in this article contain my user data and data generated with the Faker library.***
 
@@ -107,7 +107,7 @@ Each Python script does basic cleaning and column renaming to ensure data integr
     
     BigQuery Schema:
    
-    ![users schema](https://github.com/mariavyso/proto_pipeline/assets/77248576/6fd5ed05-3b02-4f0a-ae3d-d80282071891)
+    ![users schema](./readme_img/cf_users_schema.png)
     
 3. **attributes.py**: Fetches custom attributes, transforms the data into an events table, and uploads it to BigQuery's `cf_attributes` table.
 
@@ -115,7 +115,7 @@ Each Python script does basic cleaning and column renaming to ensure data integr
     
     BigQuery Schema:
    
-   ![attributes schema](https://github.com/mariavyso/proto_pipeline/assets/77248576/8d1e4255-1a86-4031-9147-8e4b67aa9216)
+   ![attributes schema](./readme_img/cf_attributes_schema.png)
 
 5. **broadcast_entries.py** and **broadcasts_list.py**: Collects broadcast lists and basic statistics, and uploads them to BigQuery `cf_broadcasts_list` table and Google Cloud Storage `cf_broadcast_entries` bucket.
 
@@ -123,11 +123,11 @@ Each Python script does basic cleaning and column renaming to ensure data integr
     
     BigQuery Schema:
    
-   ![broadcast list schema](https://github.com/mariavyso/proto_pipeline/assets/77248576/77890eff-8098-497f-ab2d-2b995a1919fe)
+   ![broadcast list schema](./readme_img/cf_broadcast_list_schema.png)
 
     cf_broadcast_entries example data:
    
-   ![broadcast entries data example](https://github.com/mariavyso/proto_pipeline/assets/77248576/37dca848-eab8-4739-8915-68709215172e)
+   ![broadcast entries data example](./readme_img/cf_broadcast_raw_data.png)
 
 7. **user_filters.py**: Sends broadcast filters to Chatfuel, receives user IDs, and uploads them to BigQuery to `cf_user_filters table` and `cf_broadcast_recipients` table.
  
@@ -137,9 +137,9 @@ Each Python script does basic cleaning and column renaming to ensure data integr
 
     BigQuery Schema:
    
-   ![user filters schema](https://github.com/mariavyso/proto_pipeline/assets/77248576/ec8db0e2-244a-4774-b1f4-88035cd4f765)
+   ![user filters schema](./readme_img/cf_uf_schema.png)
 
-   ![broadcast recipients schema](https://github.com/mariavyso/proto_pipeline/assets/77248576/e80e11b2-d3e9-47a3-b43d-676f86e61955)
+   ![broadcast recipients schema](./readme_img/cf_broadcast_recipients_schema.png)
 
 9. **segments_list.py**: Collects user segment IDs and names from Chatfuel, uploading them to BigQuery `cf_segment_list` table.
 
@@ -147,7 +147,7 @@ Each Python script does basic cleaning and column renaming to ensure data integr
 
      BigQuery Schema:
    
-    ![segment list schema](https://github.com/mariavyso/proto_pipeline/assets/77248576/1af86273-79ca-48d2-b944-9105091458d2)
+    ![segment list schema](./readme_img/cf_segment_list_schema.png)
 
 ##
 ### Data Transformation with DBT in Bigquery
@@ -164,36 +164,36 @@ I primarily use incremental tables for data transformation. Since Chatfuel's dat
     - **Transformation Details:** The `cf_users` table is truncated after processing using a post-hook.
     - Schema:
       
-      ![schema of stg cf users inc](https://github.com/mariavyso/proto_pipeline/assets/77248576/63789dc2-05e7-4703-8cd1-68ea23eaca64)
+      ![schema of stg cf users inc](./readme_img/stg_cf_users_inc_schema.png)
       
       The example of my user data:
 
-      ![example of the user data](https://github.com/mariavyso/proto_pipeline/assets/77248576/49fab3d0-7305-41ea-962c-63256b971a87)
+      ![example of the user data](./readme_img/stg_cf_users_inc_example.png)
 
 - **stg_cf_bcast_list_incremental**:
     - **Description:** An incremental table with a merge strategy. It takes data from the `cf_broadcast_list` table and inserts new rows or updates existing ones if broadcast metrics change.
     - **Transformation Details:** The `cf_broadcast_list` table is truncated after processing using a post-hook.
     - Schema:
 
-       ![schema of stg bcast list](https://github.com/mariavyso/proto_pipeline/assets/77248576/1cf21751-5a50-4d6c-90d8-ca078f6a338c)
+       ![schema of stg bcast list](./readme_img/stg_cf_bcast_list_inc_schema.png)
 
 - **stg_cf_user_filters_incremental**:
     - **Description:** An incremental table with a merge strategy. It processes data from the `cf_user_filters` table and inserts new rows if filter details are new.
     - **Transformation Details:** The `cf_user_filters` table is truncated after processing using a post-hook.
     - Schema:
 
-      ![schema of stg user filters](https://github.com/mariavyso/proto_pipeline/assets/77248576/a73de61a-640f-4ace-92a4-044f6abf0dc7)
+      ![schema of stg user filters](./readme_img/stg_cf_user_filters_inc_schema.png)
       
       The example of the data:
 
-      ![example of the user filters](https://github.com/mariavyso/proto_pipeline/assets/77248576/5a7ab385-43ab-4b2f-a700-8ee0cb589a6d)
+      ![example of the user filters](./readme_img/stg_cf_user_filters_inc_example.png)
 
 - **stg_cf_segment_list_incremental**:
     - **Description:** An incremental table with a merge strategy. It processes data from the `cf_segment_list` table, inserting new rows for new segments or updating existing ones if segment names change.
     - **Transformation Details:** The table `cf_segment_list` is truncated after processing using a post-hook.
     - Schema:
       
-      ![schema of stg segment list](https://github.com/mariavyso/proto_pipeline/assets/77248576/3733b468-df80-43da-a904-f420735631e8)
+      ![schema of stg segment list](./readme_img/stg_cf_segment_list_inc_schema.png)
 
 ##
 #### **Intermediate Models:**
@@ -203,7 +203,7 @@ I primarily use incremental tables for data transformation. Since Chatfuel's dat
     - **Transformation Details:** Truncates the source `cf_broadcast_recipients` table after processing.
     - The example of the data with my user id:
       
-      ![example of int cf attributes](https://github.com/mariavyso/proto_pipeline/assets/77248576/3c4e3a36-aecf-4ba8-a8cd-1464e7bea2af)
+      ![example of int cf attributes](./readme_img/int_cf_attributes_example.png)
 
 
 - **int_cf_broadcast_audience**:
@@ -211,21 +211,21 @@ I primarily use incremental tables for data transformation. Since Chatfuel's dat
     - **Transformation Details:** Inserts new rows if audience filters are new.
     - The example of the data:
       
-      ![example of int cf broadcast audience](https://github.com/mariavyso/proto_pipeline/assets/77248576/1ba77eb0-4616-438d-8ed9-749d743aedc8)
+      ![example of int cf broadcast audience](./readme_img/int_cf_broadcast_audience_example.png)
 
 - **int_cf_broadcast_list**:
     - **Description:** An incremental table that joins `int_cf_broadcast_audience` and `stg_cf_bcast_list_incremental`, joining broadcast analysis with the audience name, that received the broadcast.
     - **Transformation Details:** Inserts new rows if broadcasts are new.
     - The example of the data:
       
-      ![example of int cf broadcast list](https://github.com/mariavyso/proto_pipeline/assets/77248576/93b1a093-bc7f-4e20-bc03-75e3080074ed)
+      ![example of int cf broadcast list](./readme_img/int_cf_broadcast_list_example.png)
 
 - **int_cf_users_combined**:
     - **Description:** A view combining `int_cf_attributes` and `stg_cf_users_incremental` for daily analysis of user behavior and counting the number of users in engagement buckets (lead, hot lead, advocate, hero) and number of users in the opinion buckets (support, on the fence, oppose).
     - **Transformation Details:** Inserts new rows daily.
     - Schema:
       
-      ![schema of int users combined](https://github.com/mariavyso/proto_pipeline/assets/77248576/450aa4c1-962c-4904-9d78-7b920327d82c)
+      ![schema of int users combined](./readme_img/int_cf_users_combined_schema.png)
 
 ##
 #### **Mart Models:**
@@ -235,7 +235,7 @@ I primarily use incremental tables for data transformation. Since Chatfuel's dat
     - **Transformation Details:** Inserts new rows if broadcasts are new.
     - Example of the data, generated with the faker library:
       
-      ![example of broadcasts](https://github.com/mariavyso/proto_pipeline/assets/77248576/04658d9a-7c50-4856-b8f9-646671ff1a0a)
+      ![example of broadcasts](./readme_img/mart_bcast_example.png)
 
 
 - **users**:
@@ -243,7 +243,7 @@ I primarily use incremental tables for data transformation. Since Chatfuel's dat
     - **Transformation Details:** Inserts new rows daily.
     - Example of the data, generated with the faker library:
       
-      ![example of users](https://github.com/mariavyso/proto_pipeline/assets/77248576/aa9a2fab-b7aa-4a6d-9a58-ea86980bfbbc)
+      ![example of users](./readme_img/mart_users_example.png)
 
 ##
 ### Data tests with DBT
@@ -252,7 +252,7 @@ The last step of the Airflow DAG is to perform tests on the tables that have bee
 
 To make the DAG look nice and clean I used @task_group decorator.
 
-![dag run](https://github.com/mariavyso/proto_pipeline/assets/77248576/52cc5522-603f-496f-95df-28c9bfeebd86)
+![dag run](./readme_img/airflow_dags_screenshot.png)
 
 I scheduled the DAG to run every day at 12:30 AM and this final version has been running since June 25. I’ve encountered a couple of errors with the DBT jobs part, that also influenced DBT tests, but we are here to learn how to fix it, right? In both cases, it happened because I changed the date field in the Python script, which made me learn to pay close attention to timestamps and how to handle different date and time formats.
 
@@ -262,11 +262,11 @@ I scheduled the DAG to run every day at 12:30 AM and this final version has been
 
 The final step of the pipeline is the Looker dashboard, which provides a bird-eye view of how we are doing daily.
 
-![dashboard screenshot 1](https://github.com/mariavyso/proto_pipeline/assets/77248576/78546b16-bcf0-4280-b99e-b8acc8a0b2a4)
+![dashboard screenshot 1](./readme_img/looker_viz_1.png)
 
-![dashboard screenshot 2](https://github.com/mariavyso/proto_pipeline/assets/77248576/2c4534a2-4af4-4cf6-bd49-b949df16a5b5)
+![dashboard screenshot 2](./readme_img/looker_viz_2.png)
 
-![dashboard screenshot 3](https://github.com/mariavyso/proto_pipeline/assets/77248576/b2ffd6ef-7f13-43ab-ac37-81b529e254c1)
+![dashboard screenshot 3](./readme_img/looker_viz_3.png)
 
 ##
 
